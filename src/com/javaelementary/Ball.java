@@ -1,58 +1,57 @@
 package com.javaelementary;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Bounds;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.stage.Stage;
-import javafx.util.Duration;
 
-/*
-2*) нарисовть шар который сам двигается и отбивается от краев экрана
-*/
+import java.util.List;
+import java.util.Random;
 
-public class Ball extends Application {
-    public static void main(String[] args) {
-        launch();
+public class Ball {
+    private static final int DIAMETER = 100;
+    private GraphicsContext gc;
+    private double x;
+    private double y;
+    private double xCenter;
+    private double yCenter;
+    private Random random = new Random();
+    private double dx = random.nextInt(5) + 7;
+    private double dy = random.nextInt(2) + 3;
+    private List<Ball> balls;
+
+    public Ball(List<Ball> balls, GraphicsContext gc, double x, double y) {
+        this.balls = balls;
+        this.gc = gc;
+        this.x = x;
+        this.y = y;
+        xCenter = x + (DIAMETER / 2);
+        yCenter = y + (DIAMETER / 2);
     }
 
-    @Override
-    public void start(Stage stage) {
-        Pane canvas = new Pane();
-        Scene scene = new Scene(canvas, 800, 500, Color.WHITE);
-        Circle ball = new Circle(50, Color.RED);
-        ball.relocate(5, 5);
-        canvas.getChildren().add(ball);
-        stage.setTitle("Jumping Ball");
-        stage.setScene(scene);
-        stage.show();
+    public double getXCenter() {
+        return xCenter;
+    }
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(30), new EventHandler<>() {
-            double dx = 7;
-            double dy = 3;
+    public double getYCenter() {
+        return yCenter;
+    }
 
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                ball.setLayoutX(ball.getLayoutX() + dx);
-                ball.setLayoutY(ball.getLayoutY() + dy);
-                Bounds bounds = canvas.getBoundsInLocal();
-                if (ball.getLayoutX() <= bounds.getMinX() + ball.getRadius()
-                        || ball.getLayoutX() >= bounds.getMaxX() - ball.getRadius()) {
-                    dx = -dx;
-                }
-                if (ball.getLayoutY() >= bounds.getMaxY() - ball.getRadius()
-                        || ball.getLayoutY() <= bounds.getMinY() + ball.getRadius()) {
-                    dy = -dy;
-                }
-            }
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+    public void move() {
+        if (x <= 0) {
+            dx = Math.abs(dx);
+        } else if (x + DIAMETER >= gc.getCanvas().getWidth()) {
+            dx = -Math.abs(dx);
+        }
+        if (y <= 0) {
+            dy = Math.abs(dy);
+        } else if (y + DIAMETER >= gc.getCanvas().getHeight()) {
+            dy = -Math.abs(dy);
+        }
+        x += dx;
+        y += dy;
+    }
+
+    public void draw() {
+        gc.setFill(Color.RED);
+        gc.fillOval(x, y, DIAMETER, DIAMETER);
     }
 }
