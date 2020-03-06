@@ -14,8 +14,8 @@ public class Ball {
     private double xCenter;
     private double yCenter;
     private Random random = new Random();
-    private double dx = random.nextInt(5) + 7;
-    private double dy = random.nextInt(2) + 3;
+    private double dx = random.nextInt(3) + 2;
+    private double dy = random.nextInt(2) + 1;
     private List<Ball> balls;
 
     public Ball(List<Ball> balls, GraphicsContext gc, double x, double y) {
@@ -46,8 +46,17 @@ public class Ball {
         } else if (y + DIAMETER >= gc.getCanvas().getHeight()) {
             dy = -Math.abs(dy);
         }
+        for (Ball ball : balls) {
+            double hypotenuse = Math.hypot(Math.abs(xCenter - ball.getXCenter()), Math.abs(yCenter - ball.getYCenter()));
+            if (hypotenuse <= DIAMETER && hypotenuse != 0) {
+                    dy = -dy;
+                    dx = -dx;
+            }
+        }
         x += dx;
         y += dy;
+        xCenter += dx;
+        yCenter += dy;
     }
 
     public void draw() {
